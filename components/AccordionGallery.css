@@ -1,0 +1,219 @@
+/* ==========================================================================
+   AccordionGallery.css - React Bits Component Styles
+   ========================================================================== */
+
+.accordion-gallery {
+  display: flex;
+  width: 100%;
+  max-width: 1140px;
+  margin: 2rem auto 0;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.accordion-panel {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  cursor: pointer;
+  outline: none;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.85));
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  transform-style: preserve-3d;
+  display: flex;
+  align-items: stretch;
+}
+
+body[data-theme="dark"] .accordion-panel {
+  background: linear-gradient(160deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.8));
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.4);
+}
+
+.accordion-panel:focus-visible {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35) !important;
+}
+
+.accordion-panel.is-expanded {
+  flex: 5.5;
+  cursor: default;
+  box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.12);
+}
+
+.accordion-panel.panel-blue.is-expanded { border-color: rgba(59, 130, 246, 0.45); }
+.accordion-panel.panel-purple.is-expanded { border-color: rgba(139, 92, 246, 0.45); }
+.accordion-panel.panel-green.is-expanded { border-color: rgba(16, 185, 129, 0.45); }
+.accordion-panel.panel-amber.is-expanded { border-color: rgba(245, 158, 11, 0.45); }
+
+/* Collapsed view label */
+.accordion-collapsed-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  padding: 1.5rem 0.5rem;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.collapsed-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon-blue { background: #dbeafe; color: #2563eb; }
+.icon-purple { background: #ede9fe; color: #7c3aed; }
+.icon-green { background: #d1fae5; color: #059669; }
+.icon-amber { background: #fef3c7; color: #d97706; }
+
+body[data-theme="dark"] .icon-blue { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+body[data-theme="dark"] .icon-purple { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; }
+body[data-theme="dark"] .icon-green { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+body[data-theme="dark"] .icon-amber { background: rgba(245, 158, 11, 0.2); color: #fde047; }
+
+.collapsed-title {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-primary, #1e293b);
+  white-space: nowrap;
+}
+
+body[data-theme="dark"] .collapsed-title {
+  color: #f1f5f9;
+}
+
+/* Expanded panel content - 35/65 ratio, generous padding, zero clipping */
+.accordion-panel-content {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.9fr) minmax(290px, 1.1fr);
+  gap: 1.75rem;
+  padding: 2rem 2.25rem;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  z-index: 2;
+  box-sizing: border-box;
+}
+
+.panel-text-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.panel-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.panel-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary, #0f172a);
+  margin: 0;
+  line-height: 1.15;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+body[data-theme="dark"] .panel-title {
+  color: #f8fafc;
+}
+
+.panel-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #475569);
+  line-height: 1.55;
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+body[data-theme="dark"] .panel-description {
+  color: #94a3b8;
+}
+
+.panel-visual-column {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+/* Ambient glow layer */
+.panel-ambient-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  transition: opacity 0.4s ease;
+  z-index: 1;
+}
+
+.accordion-panel.is-expanded .panel-ambient-glow {
+  opacity: 0.25;
+}
+
+.glow-blue { background: radial-gradient(circle at 80% 50%, rgba(59, 130, 246, 0.4), transparent 70%); }
+.glow-purple { background: radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.4), transparent 70%); }
+.glow-green { background: radial-gradient(circle at 80% 50%, rgba(16, 185, 129, 0.4), transparent 70%); }
+.glow-amber { background: radial-gradient(circle at 80% 50%, rgba(245, 158, 11, 0.4), transparent 70%); }
+
+/* Mobile adaptation */
+@media (max-width: 860px) {
+  .accordion-gallery {
+    flex-direction: column;
+    height: auto !important;
+  }
+
+  .accordion-panel {
+    min-height: 60px;
+    flex: none !important;
+    width: 100% !important;
+  }
+
+  .accordion-panel.is-expanded {
+    min-height: 390px;
+  }
+
+  .accordion-collapsed-label {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 0.85rem 1.25rem;
+  }
+
+  .collapsed-title {
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
+
+  .accordion-panel-content {
+    grid-template-columns: 1fr;
+    padding: 1.5rem;
+    gap: 1.25rem;
+  }
+}
+

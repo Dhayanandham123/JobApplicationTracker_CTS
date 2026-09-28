@@ -1,0 +1,178 @@
+/* ==========================================================================
+   JobCalendar.css - React / Ark UI Inspired Styles
+   ========================================================================== */
+
+.job-calendar-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.job-calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.job-calendar-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cal-btn {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cal-btn:hover {
+  background: #f1f5f9;
+}
+
+.cal-month-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.cal-btn-today {
+  margin-left: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #94a3b8;
+  background: transparent;
+  cursor: pointer;
+}
+
+.job-calendar-legend {
+  display: flex;
+  gap: 1.25rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot-applied { background: #3b82f6; }
+.dot-interviewing { background: #8b5cf6; }
+.dot-offered { background: #10b981; }
+.dot-rejected { background: #ef4444; }
+
+.pulse {
+  animation: calPulse 2s infinite ease-in-out;
+}
+
+@keyframes calPulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+.job-calendar-days-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+}
+
+.job-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.4rem;
+}
+
+.job-calendar-cell {
+  min-height: 90px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.job-calendar-cell:hover {
+  transform: translateY(-1px);
+  border-color: #93c5fd;
+}
+
+.job-calendar-cell.other-month {
+  opacity: 0.35;
+  background: #f8fafc;
+  cursor: default;
+}
+
+.day-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.cal-event-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.status-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-applied { background: rgba(59, 130, 246, 0.12); color: #1d4ed8; }
+.status-applied .status-indicator { background: #3b82f6; }
+
+.status-interviewing { background: rgba(139, 92, 246, 0.14); color: #6d28d9; }
+.status-interviewing .status-indicator { background: #8b5cf6; }
+
+.status-offered { background: rgba(16, 185, 129, 0.12); color: #047857; }
+.status-offered .status-indicator { background: #10b981; }
+
+.status-rejected { background: rgba(239, 68, 68, 0.12); color: #b91c1c; }
+.status-rejected .status-indicator { background: #ef4444; }
+
+.cal-more-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #64748b;
+  padding: 0.1rem 0.3rem;
+  background: #f1f5f9;
+  border-radius: 9999px;
+  align-self: flex-start;
+}

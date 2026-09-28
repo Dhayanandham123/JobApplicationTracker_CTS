@@ -1,0 +1,93 @@
+<div class="app-card clickable-card status-accent-{{ app.status | lower }} {% if app.needs_followup %}stale-highlight{% endif %}" 
+     data-id="{{ app.id }}" 
+     data-company="{{ app.company_name | lower }}" 
+     data-title="{{ app.job_title | lower }}" 
+     data-status="{{ app.status }}"
+     onclick="handleCardClick(event, {{ app.id }})">
+    
+    {% if app.needs_followup %}
+    <div class="stale-banner">
+        <div class="stale-banner-text">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <span>{{ app.days_since_update }}d without update {% if app.formatted_last_email_sent %}| Email Sent: {{ app.formatted_last_email_sent }}{% endif %}</span>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card-header-compact">
+        <label class="card-select" onclick="event.stopPropagation()" title="Select for bulk actions">
+            <input type="checkbox" class="card-select-checkbox" data-card-select="{{ app.id }}"
+                aria-label="Select {{ app.company_name }} — {{ app.job_title }} for bulk actions">
+            <span class="card-select-box" aria-hidden="true"></span>
+        </label>
+        <h3 class="company-name">{{ app.company_name }}</h3>
+        <div class="job-title">{{ app.job_title }}</div>
+        
+        {% if app.fit_score is not none %}
+        <span class="fit-score-pill-compact {% if app.fit_score >= 70 %}fit-score-high{% elif app.fit_score >= 40 %}fit-score-med{% else %}fit-score-low{% endif %}" onclick="event.stopPropagation(); toggleMissingSkills(event, {{ app.id }})" title="Fit Score: {{ app.fit_score }}%">
+            {{ app.fit_score }}%
+        </span>
+        {% endif %}
+    </div>
+
+    <!-- Missing Skills Drawer (hidden by default) -->
+    <div id="missing-skills-drawer-{{ app.id }}" class="missing-skills-drawer hidden" onclick="event.stopPropagation()">
+        <div class="missing-skills-header">
+            <span>Missing Skills:</span>
+        </div>
+        <div class="skills-pills-wrap">
+            {% if app.missing_skills_list %}
+                {% for skill in app.missing_skills_list %}
+                <span class="skill-tag-pill">{{ skill }}</span>
+                {% endfor %}
+            {% else %}
+                <span class="skill-tag-none">No skill gaps identified.</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if app.formatted_interview_date %}
+    <div class="card-schedule-compact">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="schedule-icon-purple"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
+        <span>Interview: {{ app.formatted_interview_date }}</span>
+    </div>
+    {% endif %}
+
+    <div class="card-status-row">
+        <select class="status-dropdown status-dropdown-full status-pill-{{ app.status | lower }}" onchange="updateApplicationStatus({{ app.id }}, this.value)" onclick="event.stopPropagation()">
+            <option value="Applied" {% if app.status == 'Applied' %}selected{% endif %}>Applied</option>
+            <option value="Interviewing" {% if app.status == 'Interviewing' %}selected{% endif %}>Interviewing</option>
+            <option value="Offered" {% if app.status == 'Offered' %}selected{% endif %}>Offered</option>
+            <option value="Rejected" {% if app.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+        </select>
+    </div>
+
+    <div class="card-footer-compact">
+        <div class="notes-hint">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            <span>Notes</span>
+        </div>
+        <div class="card-footer-actions">
+            <button type="button" class="btn-text btn-card-ai" onclick="event.stopPropagation(); openChatbotWithContext('{{ app.company_name | escape }}', '{{ app.job_title | escape }}', '{{ app.status | escape }}')" title="Ask AI about this application">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path>
+                </svg>
+                <span>Ask AI</span>
+            </button>
+            <button type="button" class="btn-text btn-remove-red" onclick="event.stopPropagation(); confirmDelete({{ app.id }}, '{{ app.company_name | escape }}')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                Remove
+            </button>
+        </div>
+    </div>
+</div>

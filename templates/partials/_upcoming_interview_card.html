@@ -1,0 +1,15 @@
+<div class="upcoming-card clickable-card" id="upcoming-card-{{ app.id }}" onclick="openApplicationDetails({{ app.id }})">
+    <div class="upcoming-card-header">
+        <span class="upcoming-company-name">{{ app.company_name }}</span>
+    </div>
+    <div class="upcoming-card-body">
+        <span class="dot-accent-purple">●</span>
+        <span class="upcoming-job-title">{{ app.job_title }}</span>
+    </div>
+    <div class="upcoming-card-footer" style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
+        <span class="upcoming-date">{{ app.formatted_interview_date or 'Interview Scheduled' }}</span>
+        {% if app.formatted_last_interview_reminder_sent %}
+        <span style="font-size: 0.65rem; color: var(--text-muted);">Email Sent: {{ app.formatted_last_interview_reminder_sent }}</span>
+        {% endif %}
+    </div>
+</div>

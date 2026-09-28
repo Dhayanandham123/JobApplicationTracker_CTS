@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up — JobTrack</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-3d.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+    {% if google_client_id and not google_client_id.startswith('YOUR_GOOGLE_CLIENT_ID') %}
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    {% endif %}
+</head>
+
+<body class="auth-page" style="padding: 0; justify-content: flex-start; align-items: stretch;">
+    {% if google_client_id and not google_client_id.startswith('YOUR_GOOGLE_CLIENT_ID') %}
+    <div id="g_id_onload" data-client_id="{{ google_client_id }}" data-context="signup" data-ux_mode="popup"
+        data-callback="handleGoogleCredentialResponse" data-auto_select="true" data-itp_support="true">
+    </div>
+    {% endif %}
+
+    <div class="auth-split-layout" style="display: flex; min-height: 100vh; width: 100%;">
+        <div class="auth-split-left" style="flex: 0 0 72%; position: relative; overflow: hidden;">
+            <img src="{{ url_for('static', filename='images/login_hero.png') }}" alt="Track Applications"
+                style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
+        </div>
+        <div class="auth-split-right"
+            style="flex: 0 0 28%; display: flex; align-items: center; justify-content: center; background: #FFFFFF; padding: 24px;">
+            <div class="auth-container">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <h1 class="logo">JobTrack</h1>
+                        <p class="tagline">Create your account</p>
+                    </div>
+
+                    {% if google_client_id and not google_client_id.startswith('YOUR_GOOGLE_CLIENT_ID') %}
+                    <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_blue"
+                        data-text="signup_with" data-size="large" data-logo_alignment="left" data-width="100%"
+                        style="margin-bottom: 20px;">
+                    </div>
+                    <div style="text-align: center; margin-bottom: 20px; font-size: 0.8rem; color: #a3a3a3;">OR</div>
+                    {% endif %}
+
+                    <form action="{{ url_for('auth.signup') }}" method="POST">
+                        <div class="form-group">
+                            <label for="username">Username *</label>
+                            <input type="text" id="username" name="username" required placeholder="john_doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required placeholder="you@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password *</label>
+                            <input type="password" id="password" name="password" required
+                                placeholder="At least 6 characters" minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm_password">Confirm password *</label>
+                            <input type="password" id="confirm_password" name="confirm_password" required
+                                placeholder="Repeat your password" minlength="6">
+                        </div>
+                        {% if error %}
+                        <div class="auth-error">{{ error }}</div>
+                        {% endif %}
+                        <div class="form-actions" style="padding: 0; margin-top: 8px;">
+                            <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+                        </div>
+                    </form>
+                    <div class="auth-footer">
+                        Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/theme-3d.js') }}"></script>
+</body>
+
+</html>

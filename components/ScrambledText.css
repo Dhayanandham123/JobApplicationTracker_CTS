@@ -1,0 +1,35 @@
+/* ==========================================================================
+   ScrambledText.css - React Bits Component Styles (Subtle Theme)
+   ========================================================================== */
+
+.scrambled-text-container {
+  position: relative;
+  cursor: default;
+  user-select: text;
+}
+
+.scramble-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.scramble-char {
+  display: inline;
+  color: inherit;
+  transition: opacity 0.15s ease;
+}
+
+.scramble-char.is-scrambling {
+  /* Inherit existing description color with very slight opacity shift */
+  color: inherit;
+  opacity: 0.85;
+}
+
+body[data-theme="dark"] .scramble-char.is-scrambling {
+  color: inherit;
+  opacity: 0.88;
+}
+
+.scramble-space {
+  display: inline;
+}

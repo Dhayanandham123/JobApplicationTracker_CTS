@@ -1,0 +1,42 @@
+/* ==========================================================================
+   Highlighter.css - Magic UI Component Styles
+   ========================================================================== */
+
+.magic-highlighter-wrapper {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.magic-highlighter-text {
+  position: relative;
+  z-index: 2;
+}
+
+.magic-highlighter-svg {
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 100%;
+  height: 14px;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 1;
+}
+
+.highlighter-path {
+  stroke-dasharray: 320;
+  stroke-dashoffset: 320;
+  transition: stroke-dashoffset 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
+}
+
+.highlighter-path.is-animated {
+  stroke-dashoffset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .highlighter-path {
+    transition: none;
+    stroke-dashoffset: 0;
+  }
+}

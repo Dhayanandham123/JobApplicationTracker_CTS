@@ -1,0 +1,1781 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- 1. DASHBOARD FULL-PAGE VIEW -->
+<div id="view-dashboard" class="app-view-page">
+    <!-- Upcoming Interviews Section -->
+    <section class="upcoming-interviews-section" id="upcoming-section">
+        <div class="upcoming-section-header">
+            <h3>UPCOMING INTERVIEWS</h3>
+        </div>
+        <div class="upcoming-cards-row" id="upcoming-cards-container">
+            {% if upcoming_interviews and upcoming_interviews | length > 0 %}
+            {% for app in upcoming_interviews %}
+            {% include "partials/_upcoming_interview_card.html" %}
+            {% endfor %}
+            {% else %}
+            <div class="upcoming-empty-card">
+                <span class="upcoming-empty-text">No upcoming interviews scheduled</span>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Action Required / Follow-up Section -->
+    <section class="upcoming-interviews-section" id="action-required-section"
+        style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
+        <div class="upcoming-section-header">
+            <h3 style="color: var(--warning-amber);">ACTION REQUIRED / FOLLOW-UP</h3>
+        </div>
+        <div class="upcoming-cards-row" id="action-required-cards-container">
+            {% if followup_applications and followup_applications | length > 0 %}
+            {% for app in followup_applications %}
+            {% include "partials/_application_card.html" %}
+            {% endfor %}
+            {% else %}
+            <div class="upcoming-empty-card">
+                <span class="upcoming-empty-text">No follow-ups needed at this time</span>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Recent Career Updates (Email Intelligence Widget) -->
+    <section class="upcoming-interviews-section" id="dashboard-email-updates-section"
+        style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
+        <div class="upcoming-section-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                <h3 style="margin: 0; color: var(--primary);">RECENT CAREER UPDATES (EMAIL INTELLIGENCE)</h3>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline" id="btn-dashboard-view-email-intel" onclick="switchView('email-intelligence')">
+                View All Email Intelligence &rarr;
+            </button>
+        </div>
+        <div class="upcoming-cards-row" id="dashboard-email-updates-container">
+            <div class="upcoming-empty-card" id="dashboard-email-empty">
+                <span class="upcoming-empty-text">Connect Gmail to detect real-time recruiter emails, interviews, and updates</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="dashboard-board">
+        <!-- Column 1: Applied -->
+        <div class="status-column column-applied" id="column-Applied" data-column="Applied">
+            <div class="column-header">
+                <div class="column-title">
+                    <div class="column-icon-box icon-box-applied">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                        </svg>
+                    </div>
+                    <h2>Applied</h2>
+                </div>
+                <span class="column-count count-applied" id="col-count-Applied">{{ grouped['Applied'] | length }}</span>
+            </div>
+            <div class="column-select-row">
+                <label class="card-select column-select">
+                    <input type="checkbox" class="card-select-checkbox" data-column-select="Applied"
+                        aria-label="Select all Applied applications">
+                    <span class="card-select-box" aria-hidden="true"></span>
+                    <span class="column-select-text">Select all</span>
+                </label>
+            </div>
+            <div class="column-cards-container" id="cards-Applied">
+                {% for app in grouped['Applied'] %}
+                {% include "partials/_application_card.html" %}
+                {% endfor %}
+                <div class="empty-state {% if grouped['Applied'] | length > 0 %}hidden{% endif %}">
+                    <p>No applied jobs yet</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Column 2: Interviewing -->
+        <div class="status-column column-interviewing" id="column-Interviewing" data-column="Interviewing">
+            <div class="column-header">
+                <div class="column-title">
+                    <div class="column-icon-box icon-box-interviewing">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <h2>Interviewing</h2>
+                </div>
+                <span class="column-count count-interviewing" id="col-count-Interviewing">{{ grouped['Interviewing'] |
+                    length }}</span>
+            </div>
+            <div class="column-select-row">
+                <label class="card-select column-select">
+                    <input type="checkbox" class="card-select-checkbox" data-column-select="Interviewing"
+                        aria-label="Select all Interviewing applications">
+                    <span class="card-select-box" aria-hidden="true"></span>
+                    <span class="column-select-text">Select all</span>
+                </label>
+            </div>
+            <div class="column-cards-container" id="cards-Interviewing">
+                {% for app in grouped['Interviewing'] %}
+                {% include "partials/_application_card.html" %}
+                {% endfor %}
+                <div class="empty-state {% if grouped['Interviewing'] | length > 0 %}hidden{% endif %}">
+                    <p>No interviews scheduled</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Column 3: Offered -->
+        <div class="status-column column-offered" id="column-Offered" data-column="Offered">
+            <div class="column-header">
+                <div class="column-title">
+                    <div class="column-icon-box icon-box-offered">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Offered</h2>
+                </div>
+                <span class="column-count count-offered" id="col-count-Offered">{{ grouped['Offered'] | length }}</span>
+            </div>
+            <div class="column-select-row">
+                <label class="card-select column-select">
+                    <input type="checkbox" class="card-select-checkbox" data-column-select="Offered"
+                        aria-label="Select all Offered applications">
+                    <span class="card-select-box" aria-hidden="true"></span>
+                    <span class="column-select-text">Select all</span>
+                </label>
+            </div>
+            <div class="column-cards-container" id="cards-Offered">
+                {% for app in grouped['Offered'] %}
+                {% include "partials/_application_card.html" %}
+                {% endfor %}
+                <div class="empty-state {% if grouped['Offered'] | length > 0 %}hidden{% endif %}">
+                    <p>No offers yet</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Column 4: Rejected -->
+        <div class="status-column column-rejected" id="column-Rejected" data-column="Rejected">
+            <div class="column-header">
+                <div class="column-title">
+                    <div class="column-icon-box icon-box-rejected">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                        </svg>
+                    </div>
+                    <h2>Rejected</h2>
+                </div>
+                <span class="column-count count-rejected" id="col-count-Rejected">{{ grouped['Rejected'] | length
+                    }}</span>
+            </div>
+            <div class="column-select-row">
+                <label class="card-select column-select">
+                    <input type="checkbox" class="card-select-checkbox" data-column-select="Rejected"
+                        aria-label="Select all Rejected applications">
+                    <span class="card-select-box" aria-hidden="true"></span>
+                    <span class="column-select-text">Select all</span>
+                </label>
+            </div>
+            <div class="column-cards-container" id="cards-Rejected">
+                {% for app in grouped['Rejected'] %}
+                {% include "partials/_application_card.html" %}
+                {% endfor %}
+                <div class="empty-state {% if grouped['Rejected'] | length > 0 %}hidden{% endif %}">
+                    <p>No rejected entries</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk selection action bar (visible only when items are selected) -->
+    <div id="bulk-action-bar" class="bulk-action-bar hidden" role="toolbar" aria-label="Bulk actions">
+        <div class="bulk-row bulk-row-main">
+            <span id="bulk-selected-count" class="bulk-count" aria-live="polite">0 selected</span>
+            <span class="bulk-divider" aria-hidden="true"></span>
+            <div class="bulk-status-group">
+                <label class="bulk-status-label" for="bulk-status-select">Status</label>
+                <select id="bulk-status-select" class="bulk-select" aria-label="Target status">
+                    <option value="Applied">Applied</option>
+                    <option value="Interviewing">Interviewing</option>
+                    <option value="Offered">Offered</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+            </div>
+            <span class="bulk-divider" aria-hidden="true"></span>
+            <div class="bulk-actions-group">
+                <button type="button" id="btn-bulk-status" class="btn-bulk btn-bulk-primary">Update Status</button>
+                <button type="button" id="btn-bulk-archive" class="btn-bulk btn-bulk-secondary">Archive</button>
+                <button type="button" id="btn-bulk-delete" class="btn-bulk btn-bulk-danger">Remove</button>
+            </div>
+        </div>
+        <div class="bulk-row bulk-row-utility">
+            <button type="button" id="btn-bulk-select-all" class="btn-bulk btn-bulk-ghost">Select all visible</button>
+            <span class="bulk-dot" aria-hidden="true">·</span>
+            <button type="button" id="btn-bulk-select-stale" class="btn-bulk btn-bulk-ghost">Select stale</button>
+            <span class="bulk-dot" aria-hidden="true">·</span>
+            <button type="button" id="btn-bulk-clear" class="btn-bulk btn-bulk-ghost">Clear</button>
+        </div>
+    </div>
+
+    <!-- Generic bulk confirmation dialog -->
+    <div id="bulk-confirm-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true"
+        aria-labelledby="bulk-confirm-title">
+        <div class="modal-card modal-sm" role="document">
+            <div class="modal-header">
+                <h3 id="bulk-confirm-title">Confirm bulk action</h3>
+                <button type="button" id="btn-bulk-confirm-cancel-x" class="btn-icon" aria-label="Close dialog">×</button>
+            </div>
+            <div class="modal-body">
+                <p id="bulk-confirm-message"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btn-bulk-confirm-cancel" class="btn btn-secondary">Cancel</button>
+                <button type="button" id="btn-bulk-confirm-ok" class="btn btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2. SMART CALENDAR FULL-PAGE VIEW -->
+<div id="view-calendar" class="app-view-page hidden">
+    <!-- Calendar Search & Filters Toolbar -->
+    <div class="calendar-toolbar-card">
+        <div class="calendar-search-wrap">
+            <svg class="calendar-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="calendar-search-input" class="calendar-search-input" placeholder="Search applications, companies, or job titles..." aria-label="Search applications, companies, or job titles">
+            <button type="button" id="calendar-search-clear-btn" class="calendar-search-clear-btn hidden" title="Clear search" aria-label="Clear search">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="calendar-filter-group">
+            <div class="calendar-status-pills" id="calendar-status-pills" role="radiogroup" aria-label="Filter by application status">
+                <button type="button" class="cal-filter-pill active" data-status="all">All</button>
+                <button type="button" class="cal-filter-pill pill-applied" data-status="applied"><span class="legend-dot dot-applied"></span> Applied</button>
+                <button type="button" class="cal-filter-pill pill-interviewing" data-status="interviewing"><span class="legend-dot dot-interviewing"></span> Interviewing</button>
+                <button type="button" class="cal-filter-pill pill-offered" data-status="offered"><span class="legend-dot dot-offered"></span> Offered</button>
+                <button type="button" class="cal-filter-pill pill-rejected" data-status="rejected"><span class="legend-dot dot-rejected"></span> Rejected</button>
+            </div>
+
+            <select id="calendar-event-type-filter" class="cal-type-select" aria-label="Filter by event type">
+                <option value="all">All Events</option>
+                <option value="application">Applications</option>
+                <option value="interview">Interviews</option>
+                <option value="assessment">Assessments</option>
+                <option value="offer">Offers</option>
+            </select>
+
+            <button type="button" id="calendar-clear-filters-btn" class="btn-clear-cal-filters hidden" title="Reset filters">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                <span>Clear filters</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="page-view-banner calendar-page-banner">
+        <div class="calendar-header-top">
+            <div class="calendar-title-nav">
+                <button id="cal-prev-month" class="btn btn-secondary btn-sm cal-nav-btn" title="Previous Month" aria-label="Previous Month">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    <span>Prev</span>
+                </button>
+                <div class="calendar-selects-container">
+                    <select id="calendar-month-select" class="cal-select" aria-label="Select Month">
+                        <option value="0">January</option>
+                        <option value="1">February</option>
+                        <option value="2">March</option>
+                        <option value="3">April</option>
+                        <option value="4">May</option>
+                        <option value="5">June</option>
+                        <option value="6">July</option>
+                        <option value="7">August</option>
+                        <option value="8">September</option>
+                        <option value="9">October</option>
+                        <option value="10">November</option>
+                        <option value="11">December</option>
+                    </select>
+                    <select id="calendar-year-select" class="cal-select" aria-label="Select Year">
+                        <!-- Populated by JS -->
+                    </select>
+                    <button id="cal-today-btn" class="btn btn-outline btn-sm cal-today-btn" title="Go to current month">Today</button>
+                </div>
+                <button id="cal-next-month" class="btn btn-secondary btn-sm cal-nav-btn" title="Next Month" aria-label="Next Month">
+                    <span>Next</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Clean Status Legend with subtle circular dots -->
+            <div class="calendar-legend-bar">
+                <span class="legend-item"><span class="legend-dot dot-applied"></span> Applied</span>
+                <span class="legend-item"><span class="legend-dot dot-interviewing"></span> Interviewing</span>
+                <span class="legend-item"><span class="legend-dot dot-offered"></span> Offered</span>
+                <span class="legend-item"><span class="legend-dot dot-rejected"></span> Rejected</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Calendar Container -->
+    <div class="calendar-container full-page-calendar">
+        <div class="calendar-days-header">
+            <span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span>
+        </div>
+        <div id="calendar-grid" class="calendar-grid">
+            <!-- Dynamically generated days -->
+        </div>
+    </div>
+
+    <!-- Selected Date Event Summary Section Below Calendar -->
+    <div id="calendar-selected-date-section" class="calendar-selected-date-section">
+        <div class="selected-date-header">
+            <div class="selected-date-title-group">
+                <span class="selected-date-eyebrow">Selected Date</span>
+                <div class="selected-date-sub-row">
+                    <h3 class="selected-date-display" id="calSelectedDateTitle">Select a date</h3>
+                    <span class="selected-date-dot-separator">·</span>
+                    <span class="selected-date-count" id="calSelectedDateCount">0 events</span>
+                </div>
+            </div>
+        </div>
+        <div class="selected-date-cards-grid" id="calSelectedDateEventsList">
+            <div class="selected-date-empty">
+                <span>No events scheduled for this day.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Day Agenda Section (shown on narrow viewports) -->
+    <div id="calendar-mobile-agenda" class="calendar-mobile-agenda hidden">
+        <div class="agenda-header">
+            <h4 id="agendaSelectedDateTitle">Selected Date Events</h4>
+            <span class="agenda-count-badge" id="agendaCountBadge">0 Events</span>
+        </div>
+        <div class="agenda-list" id="agendaEventsList">
+            <!-- Dynamically rendered day cards on mobile -->
+        </div>
+    </div>
+</div>
+
+<!-- Floating Hover Popover Tooltip for Calendar Events -->
+<div id="cal-event-popover" class="cal-event-popover hidden" role="tooltip" aria-hidden="true">
+    <div class="popover-arrow"></div>
+    <div class="popover-header">
+        <div class="popover-company" id="popoverCompany">Company</div>
+        <span class="popover-status-badge" id="popoverStatus">Status</span>
+    </div>
+    <div class="popover-role" id="popoverRole">Job Title</div>
+    <div class="popover-details-grid">
+        <div class="popover-detail-item" id="popoverLocationRow">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span id="popoverLocation">Location</span>
+        </div>
+        <div class="popover-detail-item" id="popoverDateRow">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span id="popoverDate">Date</span>
+        </div>
+    </div>
+    <div class="popover-notes" id="popoverNotes"></div>
+    <div class="popover-footer">
+        <span class="popover-hint">Click event to view details &amp; highlight in board</span>
+    </div>
+</div>
+
+<!-- Calendar Quick Detail Modal -->
+<div id="calendar-event-modal" class="modal-backdrop hidden" style="z-index: 2100;">
+    <div class="modal-card modal-md">
+        <div class="modal-header">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div class="cal-modal-avatar" id="calModalAvatar">G</div>
+                <div>
+                    <h3 id="calModalCompany" style="margin: 0;">Company Name</h3>
+                    <span id="calModalRole" style="font-size: 0.9rem; color: var(--text-secondary);">Job Title</span>
+                </div>
+            </div>
+            <button id="cal-modal-close" class="btn-icon" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="cal-modal-status-row" style="margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between;">
+                <span class="activity-pill" id="calModalStatusBadge">Status</span>
+                <span id="calModalFitScore" class="fit-score-badge">Fit Score: 91%</span>
+            </div>
+            <div class="cal-modal-grid">
+                <div class="cal-modal-field">
+                    <label>Location</label>
+                    <span id="calModalLocation">-</span>
+                </div>
+                <div class="cal-modal-field">
+                    <label>Salary</label>
+                    <span id="calModalSalary">-</span>
+                </div>
+                <div class="cal-modal-field">
+                    <label>Job Type</label>
+                    <span id="calModalJobType">-</span>
+                </div>
+                <div class="cal-modal-field">
+                    <label>Resume Version</label>
+                    <span id="calModalResume">-</span>
+                </div>
+                <div class="cal-modal-field">
+                    <label>Date Applied</label>
+                    <span id="calModalDateApplied">-</span>
+                </div>
+                <div class="cal-modal-field">
+                    <label>Interview / Assessment</label>
+                    <span id="calModalInterviewDate">-</span>
+                </div>
+            </div>
+            <div class="cal-modal-notes-box" style="margin-top: 1.25rem;">
+                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">Notes &amp; Activity Log</label>
+                <p id="calModalNotes" style="font-size: 0.9rem; line-height: 1.5; color: var(--text-primary); margin: 0; background: var(--bg-main); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);"></p>
+            </div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+            <a id="calModalJobLink" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                <span>Visit Job Link</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+            </a>
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="button" id="cal-modal-cancel" class="btn btn-secondary btn-sm">Close</button>
+                <button type="button" id="cal-modal-goto-board" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                    <span>View in Kanban</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 3. ANALYTICS & PERFORMANCE INSIGHTS FULL-PAGE VIEW -->
+<div id="view-analytics" class="app-view-page hidden">
+    <div class="page-view-banner">
+        <div>
+            <h2>Analytics & Performance Insights</h2>
+            <p class="page-view-subtitle">Performance metrics and conversion insights for your job search.</p>
+        </div>
+    </div>
+
+    <div class="full-page-analytics-body">
+        <!-- 4 Top KPI Cards -->
+        <div class="analytics-kpi-grid">
+            <div class="kpi-metric-card">
+                <div class="kpi-card-header">
+                    <span class="kpi-title">Total Applications</span>
+                    <span class="kpi-icon icon-blue">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                    </span>
+                </div>
+                <div class="kpi-value" id="kpi-total-apps">0</div>
+                <span class="kpi-subtext">Submissions logged</span>
+            </div>
+
+            <div class="kpi-metric-card">
+                <div class="kpi-card-header">
+                    <span class="kpi-title">Interview Rate</span>
+                    <span class="kpi-icon icon-purple">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </span>
+                </div>
+                <div class="kpi-value" id="kpi-interview-rate">0.0%</div>
+                <span class="kpi-subtext" id="kpi-interview-subtext">0 interviews</span>
+            </div>
+
+            <div class="kpi-metric-card">
+                <div class="kpi-card-header">
+                    <span class="kpi-title">Offer Rate</span>
+                    <span class="kpi-icon icon-green">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </span>
+                </div>
+                <div class="kpi-value" id="kpi-offer-rate">0.0%</div>
+                <span class="kpi-subtext" id="kpi-offer-subtext">0 offers</span>
+            </div>
+
+            <div class="kpi-metric-card">
+                <div class="kpi-card-header">
+                    <span class="kpi-title">Rejection Rate</span>
+                    <span class="kpi-icon icon-red">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                        </svg>
+                    </span>
+                </div>
+                <div class="kpi-value" id="kpi-rejection-rate">0.0%</div>
+                <span class="kpi-subtext" id="kpi-rejection-subtext">0 rejections</span>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="analytics-charts-grid">
+            <!-- Chart 1: Status Funnel Breakdown Progress Bars -->
+            <div class="analytics-chart-box">
+                <h4>Status Funnel Breakdown</h4>
+                <div class="funnel-container" id="funnel-container">
+                    <div class="funnel-row">
+                        <div class="funnel-label-group">
+                            <span class="funnel-label">Applied</span>
+                            <span class="funnel-count" id="funnel-count-applied">0 applications</span>
+                        </div>
+                        <div class="funnel-bar-bg">
+                            <div class="funnel-bar-fill fill-applied" id="funnel-bar-applied" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="funnel-row">
+                        <div class="funnel-label-group">
+                            <span class="funnel-label">Interviewing</span>
+                            <span class="funnel-count" id="funnel-count-interviewing">0 applications</span>
+                        </div>
+                        <div class="funnel-bar-bg">
+                            <div class="funnel-bar-fill fill-interviewing" id="funnel-bar-interviewing"
+                                style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="funnel-row">
+                        <div class="funnel-label-group">
+                            <span class="funnel-label">Offered</span>
+                            <span class="funnel-count" id="funnel-count-offered">0 applications</span>
+                        </div>
+                        <div class="funnel-bar-bg">
+                            <div class="funnel-bar-fill fill-offered" id="funnel-bar-offered" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="funnel-row">
+                        <div class="funnel-label-group">
+                            <span class="funnel-label">Rejected</span>
+                            <span class="funnel-count" id="funnel-count-rejected">0 applications</span>
+                        </div>
+                        <div class="funnel-bar-bg">
+                            <div class="funnel-bar-fill fill-rejected" id="funnel-bar-rejected" style="width: 0%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart 2: Status Proportion Ring Chart -->
+            <div class="analytics-chart-box">
+                <h4>Status Proportion Breakdown</h4>
+                <div class="donut-chart-wrapper">
+                    <div class="donut-chart-container" id="donut-chart-container">
+                        <svg viewBox="0 0 36 36" class="donut-svg">
+                            <path class="donut-ring"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none" stroke="var(--bg-main)" stroke-width="3.8" />
+                            <path id="donut-segment-applied" class="donut-segment segment-applied"
+                                stroke-dasharray="0, 100"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none" stroke="var(--status-applied)" stroke-width="3.8" />
+                            <path id="donut-segment-interviewing" class="donut-segment segment-interviewing"
+                                stroke-dasharray="0, 100"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none" stroke="var(--status-interviewing)" stroke-width="3.8" />
+                            <path id="donut-segment-offered" class="donut-segment segment-offered"
+                                stroke-dasharray="0, 100"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none" stroke="var(--status-offered)" stroke-width="3.8" />
+                            <path id="donut-segment-rejected" class="donut-segment segment-rejected"
+                                stroke-dasharray="0, 100"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none" stroke="var(--status-rejected)" stroke-width="3.8" />
+                        </svg>
+                        <div class="donut-center-text">
+                            <span class="donut-center-number" id="donut-total">0</span>
+                            <span class="donut-center-label">Total</span>
+                        </div>
+                    </div>
+                    <div class="donut-legend">
+                        <div class="legend-badge"><span class="badge-dot dot-applied"></span> Applied</div>
+                        <div class="legend-badge"><span class="badge-dot dot-interviewing"></span> Interviewing</div>
+                        <div class="legend-badge"><span class="badge-dot dot-offered"></span> Offered</div>
+                        <div class="legend-badge"><span class="badge-dot dot-rejected"></span> Rejected</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section: Resume Version Performance -->
+    <div class="analytics-card" style="margin-top: 24px;">
+        <h4>Resume Version Performance</h4>
+        <p class="analytics-subtitle">Compare interview callback conversion rates across your saved resume versions.</p>
+        <div id="analytics-versions-chart" class="versions-performance-container">
+            <!-- Dynamically populated via JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Full-Page View: Fit Score & Skill Gap Analysis -->
+<div id="view-fit-score" class="app-view-page hidden">
+    <div class="page-view-banner">
+        <div>
+            <h2>Resume–JD Fit Score & Skill Gap Analysis</h2>
+            <p class="page-view-subtitle">Upload your resume document (.pdf, .docx) to analyze matches against job
+                postings and discover missing skills.</p>
+        </div>
+    </div>
+
+    <div class="fit-score-page-grid">
+        <!-- Resume Version Selection & Document Upload Card -->
+        <div class="analytics-card fit-score-resume-card">
+            <div class="card-header-flex" style="flex-wrap: wrap; gap: 1rem; align-items: center;">
+                <div>
+                    <h4>Active Resume Version for Analysis</h4>
+                    <p class="analytics-subtitle" style="margin: 0;">Select which saved resume version to analyze
+                        against job postings or upload a new document.</p>
+                </div>
+                <div class="resume-version-selector-group">
+                    <label for="fit-score-version-select" class="version-select-label">Select Version:</label>
+                    <select id="fit-score-version-select" class="form-control-sm version-dropdown-select">
+                        <option value="master">Master Resume (Default)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="version-active-details-row" style="margin-top: 15px;">
+                <div id="uploaded-resume-card" class="uploaded-resume-card">
+                    <div class="uploaded-file-info">
+                        <div class="uploaded-file-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                        </div>
+                        <div>
+                            <span id="uploaded-filename" class="uploaded-filename">Master Resume</span>
+                            <span id="uploaded-version-badge" class="uploaded-badge">Active Version</span>
+                        </div>
+                    </div>
+                    <button type="button" id="btn-fit-score-upload-new" class="btn btn-sm btn-secondary">+ Upload New
+                        Version</button>
+                </div>
+            </div>
+
+            <!-- Drag and Drop Dropzone -->
+            <div id="resume-dropzone" class="resume-dropzone hidden" style="margin-top: 15px;">
+                <div class="quick-version-input-row" style="margin-bottom: 10px; display: flex; gap: 0.5rem;">
+                    <input type="text" id="quick-version-name-input" class="form-control-sm"
+                        placeholder="Version Name (e.g. Version C - AI Focus)" style="flex: 1;">
+                </div>
+                <input type="file" id="resume-file-input" accept=".pdf,.docx,.doc,.txt" class="file-input-hidden">
+                <div class="dropzone-content">
+                    <div class="dropzone-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <path d="M12 18v-6"></path>
+                            <path d="m9 15 3-3 3 3"></path>
+                        </svg>
+                    </div>
+                    <div class="dropzone-text">
+                        <span class="dropzone-title">Click or Drag & Drop new resume document here</span>
+                        <span class="dropzone-sub">Supports PDF (.pdf), Word (.docx), or TXT documents</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extracted Resume Text Preview Panel -->
+            <div id="extracted-text-preview-container" class="resume-preview-panel hidden"
+                style="margin-top: 15px;">
+                <div class="resume-preview-header">
+                    <div class="resume-preview-title-wrap">
+                        <h5 class="resume-preview-title">Extracted Resume Text</h5>
+                        <p class="resume-preview-subtitle">Read-only preview of content extracted from your active
+                            resume</p>
+                    </div>
+                    <span id="resume-extraction-status" class="resume-status-badge" role="status">No resume</span>
+                </div>
+                <div id="resume-preview-body" class="resume-preview-body collapsed">
+                    <pre id="resume-preview-pre" class="resume-preview-pre" tabindex="0"
+                        aria-label="Extracted resume text preview"></pre>
+                    <div id="resume-preview-empty" class="resume-preview-empty hidden">
+                        <p>No resume text extracted yet.</p>
+                        <p class="analytics-subtitle">Upload a resume document to generate a preview.</p>
+                    </div>
+                </div>
+                <div class="resume-preview-footer">
+                    <span id="resume-char-count" class="resume-char-count" aria-live="polite"></span>
+                    <span class="resume-preview-actions">
+                        <button type="button" id="btn-copy-resume-text" class="btn-text">Copy</button>
+                        <button type="button" id="btn-toggle-extracted-text" class="btn-text" aria-expanded="false"
+                            aria-controls="resume-preview-body">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" aria-hidden="true">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                            <span id="btn-toggle-extracted-text-label">Expand</span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Application Fit Scores List -->
+        <div class="analytics-card" style="margin-top: 24px;">
+            <div class="card-header-flex">
+                <h4>Application Fit Scores (Sorted Highest to Lowest)</h4>
+                <button type="button" id="btn-fit-optimize" class="btn btn-sm btn-primary">Optimize Resume</button>
+            </div>
+            <p class="analytics-subtitle">Match scores generated by Groq AI comparing your resume with each job
+                description.</p>
+            <div id="fit-score-apps-list" class="fit-score-apps-list">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </div>
+
+        <!-- Structured AI FIT analysis result (populated after Analyze Resume) -->
+        <div id="fit-analysis-result" class="analytics-card hidden" style="margin-top: 24px;" aria-live="polite">
+            <!-- Rendered by refine.js renderFitAnalysis(): score ring, strengths,
+                 priority improvements, keywords, final advice. Never raw JSON. -->
+        </div>
+    </div>
+
+    <!-- AI Assistant job-target popover (anchored near the chat assistant) -->
+    <div id="fit-optimize-popover" class="fit-optimize-popover hidden" role="dialog"
+        aria-modal="false" aria-labelledby="fit-optimize-title">
+        <div class="fit-popover-header">
+            <div>
+                <h5 id="fit-optimize-title">Optimize your resume</h5>
+                <p class="analytics-subtitle" style="margin: 0;">Which job should we optimize for?</p>
+            </div>
+            <button type="button" id="btn-fit-popover-close" class="btn-icon" aria-label="Close job selection">✕</button>
+        </div>
+        <div id="fit-optimize-options" class="fit-popover-options" role="radiogroup"
+            aria-label="Recently applied jobs">
+            <!-- Dynamically populated via JS from actual application data -->
+        </div>
+        <div class="fit-popover-footer">
+            <span id="fit-popover-hint" class="save-status-text" role="status" aria-live="polite"></span>
+            <button type="button" id="btn-fit-analyze" class="btn btn-sm btn-primary" disabled>Analyze Resume</button>
+        </div>
+    </div>
+</div>
+
+<!-- Full-Page View: Resume Version A/B Tracking -->
+<div id="view-resume-versions" class="app-view-page hidden">
+    <div class="page-view-banner">
+        <div>
+            <h2>Resume Version Tracking</h2>
+            <p class="page-view-subtitle">Manage custom tailored resume versions with uploaded files and track interview
+                conversion performance side-by-side.</p>
+        </div>
+    </div>
+
+    <div class="resume-versions-page-grid">
+        <!-- Version Manager -->
+        <div class="analytics-card">
+            <h4>Saved Resume Versions</h4>
+            <p class="analytics-subtitle">Create distinct tailored resume versions with uploaded document files (.pdf,
+                .docx, .txt) to assign to job applications.</p>
+
+            <form id="add-version-form" class="version-add-container" style="margin-top: 15px;">
+                <div class="add-version-inputs-grid">
+                    <input type="text" id="new-version-input" class="form-control"
+                        placeholder="Version Name (e.g. Version A - Backend Developer)" required>
+                    <div class="version-file-picker-wrapper">
+                        <input type="file" id="version-file-input" accept=".pdf,.docx,.doc,.txt"
+                            class="file-input-hidden">
+                        <button type="button" id="btn-select-version-file" class="btn btn-secondary btn-file-select">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <path d="M12 18v-6"></path>
+                                <path d="m9 15 3-3 3 3"></path>
+                            </svg>
+                            <span id="version-file-label">Attach File (.pdf, .docx)</span>
+                        </button>
+                    </div>
+                    <button type="submit" id="btn-add-version" class="btn btn-primary">Save Version</button>
+                </div>
+            </form>
+
+            <div id="versions-pills-list" class="versions-pills-list" style="margin-top: 20px;">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </div>
+
+        <!-- A/B Conversion Performance Chart -->
+        <div class="analytics-card" style="margin-top: 24px;">
+            <h4>A/B Conversion Performance by Resume Version</h4>
+            <p class="analytics-subtitle">Interview rates and offer metrics broken down by resume version.</p>
+            <div id="versions-performance-container" class="versions-performance-container">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Full-Page View 4: User Profile & Account Information -->
+<div id="view-profile" class="app-view-page hidden">
+    <div class="page-view-banner">
+        <div>
+            <h2>Profile Information</h2>
+            <p class="page-view-subtitle">Manage your photo, contact details, academic background, and professional
+                title.</p>
+        </div>
+        <button type="submit" form="profile-form" class="btn btn-primary">Save Profile</button>
+    </div>
+
+    <div class="profile-page-grid">
+        <div class="profile-card">
+            <form id="profile-form">
+                <!-- Avatar & Header Section -->
+                <div class="profile-header-avatar">
+                    <div class="avatar-edit-wrapper">
+                        <div class="user-avatar-large" id="profile-avatar-preview">
+                            {% if current_user and current_user.avatar_url %}
+                            <img src="{{ current_user.avatar_url }}" alt="Avatar" class="avatar-img">
+                            {% else %}
+                            {{ current_user.username[0]|upper if current_user and current_user.username else 'U' }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="profile-user-info">
+                        <h3 id="profile-header-name">{{ current_user.full_name or current_user.username if current_user
+                            else 'User' }}</h3>
+                        <p id="profile-header-headline">{{ current_user.headline or 'Computer Science Student | Python &
+                            AI/ML' }}</p>
+                        <span class="user-status-pill">Verified Account</span>
+                    </div>
+                </div>
+
+                <!-- Form Fields Grid -->
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="profile-full-name">Full Name</label>
+                        <input type="text" id="profile-full-name" name="full_name"
+                            value="{{ current_user.full_name or '' }}" placeholder="Dhayanandham R">
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="profile-email">Email Address</label>
+                        <input type="email" id="profile-email" value="{{ current_user.email or '' }}" readonly
+                            class="readonly-input">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="profile-phone">Phone Number</label>
+                        <input type="tel" id="profile-phone" name="phone" value="{{ current_user.phone or '' }}"
+                            placeholder="+1 555-0192">
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="profile-location">Location / City</label>
+                        <input type="text" id="profile-location" name="location"
+                            value="{{ current_user.location or '' }}" placeholder="San Francisco, CA">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="profile-headline">Professional Title</label>
+                    <input type="text" id="profile-headline" name="headline" value="{{ current_user.headline or '' }}"
+                        placeholder="Computer Science Student | Python & AI/ML">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="profile-university">College / University</label>
+                        <input type="text" id="profile-university" name="university"
+                            value="{{ current_user.university or '' }}" placeholder="Stanford University">
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="profile-grad-year">Graduation Year</label>
+                        <input type="text" id="profile-grad-year" name="grad_year"
+                            value="{{ current_user.grad_year or '' }}" placeholder="2026">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <span class="form-label" id="profile-photo-label">Profile Photo</span>
+                    <div class="photo-manager" role="group" aria-labelledby="profile-photo-label">
+                        <div class="photo-manager-preview user-avatar-large" id="profile-photo-manager-preview"
+                            role="img" aria-label="Current profile photo preview">
+                            {% if current_user and current_user.avatar_url %}
+                            <img src="{{ current_user.avatar_url }}" alt="Profile photo" class="avatar-img"
+                                id="profile-photo-img">
+                            {% else %}
+                            <span id="profile-photo-initials"
+                                aria-hidden="true">{{ current_user.username[0]|upper if current_user and
+                                current_user.username else 'U' }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="photo-manager-actions">
+                            <input type="file" id="profile-photo-input" class="file-input-hidden"
+                                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" aria-label="Choose profile photo">
+                            <button type="button" id="btn-photo-change" class="btn btn-sm btn-secondary">Change
+                                Photo</button>
+                            <button type="button" id="btn-photo-remove" class="btn btn-sm btn-outline">Remove
+                                Photo</button>
+                            <span class="photo-manager-hint">JPG, PNG or WEBP · max 2 MB</span>
+                            <span id="profile-photo-status" class="save-status-text" role="status"
+                                aria-live="polite"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions-right">
+                    <span id="profile-save-status" class="save-status-text"></span>
+                    <button type="submit" class="btn btn-primary">Save Profile Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Full-Page View: Email Intelligence -->
+<div id="view-email-intelligence" class="app-view-page hidden">
+    <!-- Page Header & Connection Controls -->
+    <div class="page-view-banner email-intel-banner">
+        <div class="email-banner-info">
+            <div class="email-banner-title-row">
+                <h2>Email Intelligence</h2>
+                <div id="email-connection-status-pill" class="email-status-pill status-pill-disconnected">
+                    <span class="status-dot"></span>
+                    <span id="email-status-text">Gmail Not Connected</span>
+                </div>
+            </div>
+            <p class="page-view-subtitle">Automatically detect and organize recruitment updates, interviews, and assessments from your inbox.</p>
+        </div>
+        <div class="email-banner-actions" id="email-banner-actions">
+            <button type="button" id="btn-sync-emails" class="btn btn-primary btn-sync-emails hidden" title="Sync now">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="sync-icon">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                <span id="btn-sync-text">Sync Now</span>
+            </button>
+            <button type="button" id="btn-disconnect-gmail" class="btn btn-outline btn-sm btn-disconnect hidden" title="Disconnect Gmail">
+                Disconnect
+            </button>
+        </div>
+    </div>
+
+    <!-- Reusable Email Intelligence Error / Diagnostic Alert Box -->
+    <div id="email-intel-alert-box" class="email-intel-alert-box hidden" role="alert">
+        <div class="alert-icon-box" id="email-alert-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+        </div>
+        <div class="alert-content">
+            <h4 class="alert-title" id="email-alert-title">Notification</h4>
+            <p class="alert-desc" id="email-alert-message">Details</p>
+        </div>
+        <div class="alert-actions" id="email-alert-actions"></div>
+    </div>
+
+    <!-- Compact Statistics Cards Bar (Populated dynamically from real data) -->
+    <div class="email-stats-grid" id="email-stats-grid">
+        <div class="email-stat-card">
+            <div class="stat-icon-wrap icon-wrap-blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number" id="stat-career-emails">0</span>
+                <span class="stat-label">Career Emails</span>
+            </div>
+        </div>
+
+        <div class="email-stat-card">
+            <div class="stat-icon-wrap icon-wrap-indigo">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number" id="stat-interviews">0</span>
+                <span class="stat-label">Interviews</span>
+            </div>
+        </div>
+
+        <div class="email-stat-card">
+            <div class="stat-icon-wrap icon-wrap-amber">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number" id="stat-assessments">0</span>
+                <span class="stat-label">Assessments</span>
+            </div>
+        </div>
+
+        <div class="email-stat-card">
+            <div class="stat-icon-wrap icon-wrap-emerald">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number" id="stat-offers">0</span>
+                <span class="stat-label">Offers</span>
+            </div>
+        </div>
+
+        <div class="email-stat-card">
+            <div class="stat-icon-wrap icon-wrap-purple">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                    <polyline points="2 17 12 22 22 17"></polyline>
+                    <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number" id="stat-needs-review">0</span>
+                <span class="stat-label">Requires Review</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. DISCONNECTED STATE (Prompt to connect via Google OAuth) -->
+    <div id="email-disconnected-container" class="email-auth-card">
+        <div class="email-auth-icon-box">
+            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.8">
+                <path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+                <path d="M19 16v6"></path>
+                <path d="M22 19l-3-3-3 3"></path>
+            </svg>
+        </div>
+        <h3>Connect Your Gmail Account</h3>
+        <p class="email-auth-desc">
+            Connect your Gmail account with official Google OAuth to automatically detect job application confirmations, 
+            interview invitations, coding assessments, recruiter outreach, and status updates.
+        </p>
+
+        <a href="/auth/google/gmail/connect" class="btn btn-primary btn-lg btn-connect-google" id="btn-connect-gmail-oauth">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+            </svg>
+            <span>Connect Gmail</span>
+        </a>
+
+        <div class="email-privacy-notice">
+            <div class="privacy-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+            <span><strong>Privacy First:</strong> We only process job-search related emails with read-only access. We NEVER ask for your password and NEVER share your personal email.</span>
+        </div>
+    </div>
+
+    <!-- 2. CONNECTED STATE (Live sync, career updates list, and proposal actions) -->
+    <div id="email-connected-container" class="email-connected-layout hidden">
+        <!-- Live Sync Status Banner -->
+        <div id="email-sync-status-banner" class="email-sync-status-banner hidden">
+            <div class="sync-spinner"></div>
+            <span id="email-sync-status-text">Scanning inbox for job updates...</span>
+        </div>
+
+        <!-- Section: Recent Career Updates List -->
+        <div class="email-updates-section">
+            <div class="updates-header-row">
+                <div class="updates-title-group">
+                    <h3>Recent Career Updates</h3>
+                    <span class="updates-subtitle">AI-detected updates matched against your applications</span>
+                </div>
+                <div class="email-filter-pills" id="email-filter-pills">
+                    <button type="button" class="filter-pill active" data-filter="all">All</button>
+                    <button type="button" class="filter-pill" data-filter="interviews">Interviews</button>
+                    <button type="button" class="filter-pill" data-filter="assessments">Assessments</button>
+                    <button type="button" class="filter-pill" data-filter="offers">Offers</button>
+                    <button type="button" class="filter-pill" data-filter="rejections">Rejections</button>
+                    <button type="button" class="filter-pill" data-filter="needs_review">Requires Review</button>
+                </div>
+            </div>
+
+            <!-- Career Email Cards List -->
+            <div id="email-updates-cards-list" class="email-updates-cards-list">
+                <!-- Dynamically populated via JS -->
+            </div>
+
+            <!-- Empty State for Connected Inbox with No Career Updates -->
+            <div id="email-no-updates-card" class="email-no-updates-card hidden">
+                <div class="no-updates-icon">📭</div>
+                <h4>No Career Emails Found</h4>
+                <p>We couldn't find any job-search related emails in your inbox during the last scan.</p>
+                <button type="button" class="btn btn-primary btn-sm" onclick="triggerEmailSync()">Sync Again</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Add Application Modal -->
+<div id="add-modal" class="modal-backdrop hidden">
+    <div class="modal-card modal-lg">
+        <div class="modal-header">
+            <h3>Add New Application</h3>
+            <button id="modal-close-btn" class="btn-icon">&times;</button>
+        </div>
+
+        <form id="add-app-form">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="add-job-url">Application Link / Job URL</label>
+                    <div class="url-autofill-group">
+                        <input type="url" id="add-job-url" name="job_url"
+                            placeholder="https://linkedin.com/jobs/view/...">
+                        <button type="button" id="btn-autofill-add" class="btn btn-sm btn-autofill"
+                            title="Auto-fill Company, Title, Location & Salary from URL">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                            </svg> Auto-Fill
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="company_name">Company Name <span class="required">*</span></label>
+                        <input type="text" id="company_name" name="company_name" required
+                            placeholder="e.g. Google, Stripe, Salesforce">
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="job_title">Job Title <span class="required">*</span></label>
+                        <input type="text" id="job_title" name="job_title" required
+                            placeholder="e.g. Software Engineer Intern">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-3">
+                        <label for="job_type">Job Type</label>
+                        <select id="job_type" name="job_type">
+                            <option value="Full-time" selected>Full-time</option>
+                            <option value="Internship">Internship</option>
+                            <option value="Part-time">Part-time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-3">
+                        <label for="status">Initial Status</label>
+                        <select id="status" name="status">
+                            <option value="Applied" selected>Applied</option>
+                            <option value="Interviewing">Interviewing</option>
+                            <option value="Offered">Offered</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-3">
+                        <label for="add-resume-version">Resume</label>
+                        <select id="add-resume-version" name="resume_version" class="resume-version-select">
+                            <option value="">(None / Default)</option>
+                            {% for version in resume_versions %}
+                            <option value="{{ version.version_name }}">{{ version.version_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-3">
+                        <label for="salary">Salary</label>
+                        <input type="text" id="salary" name="salary" placeholder="e.g. $120k or ₹15 LPA">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" name="location" placeholder="e.g. Remote, San Francisco, CA">
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="date_applied">Date Applied</label>
+                        <input type="date" id="date_applied" name="date_applied" value="{{ today_str }}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="interview_date">Interview Date <span
+                                class="optional-label">(Optional)</span></label>
+                        <input type="date" id="interview_date" name="interview_date">
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="assessment_date">Assessment Date <span
+                                class="optional-label">(Optional)</span></label>
+                        <input type="date" id="assessment_date" name="assessment_date">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Notes & Overview</label>
+                    <textarea id="notes" name="notes" rows="3"
+                        placeholder="Interviewer names, referral details, key job specs..."></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Application</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Application Details Modal -->
+<div id="details-modal" class="modal-backdrop hidden">
+    <div class="modal-card modal-lg details-modal-card">
+        <div class="modal-header details-modal-header">
+            <div class="details-title-group">
+                <h3 id="details-company-title">Company Name</h3>
+                <span class="details-job-subtitle" id="details-job-subtitle">Job Role</span>
+            </div>
+            <div class="details-header-actions">
+                <select id="details-status-select" class="status-dropdown">
+                    <option value="Applied">Applied</option>
+                    <option value="Interviewing">Interviewing</option>
+                    <option value="Offered">Offered</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+                <button id="details-close-btn" class="btn-icon">&times;</button>
+            </div>
+        </div>
+
+        <!-- View Mode Container -->
+        <div id="details-view-mode" class="modal-body details-modal-body">
+            
+            <div class="view-grid">
+                <div class="view-group">
+                    <span class="view-label">Application Link</span>
+                    <a href="#" id="view-job-url" target="_blank" rel="noopener noreferrer" class="view-value view-link">Not provided</a>
+                </div>
+            </div>
+
+            <div class="view-grid col-2">
+                <div class="view-group">
+                    <span class="view-label">Job Type</span>
+                    <span class="view-value" id="view-job-type">--</span>
+                </div>
+                <div class="view-group">
+                    <span class="view-label">Resume</span>
+                    <span class="view-value" id="view-resume">--</span>
+                </div>
+                <div class="view-group">
+                    <span class="view-label">Salary / Compensation</span>
+                    <span class="view-value" id="view-salary">--</span>
+                </div>
+                <div class="view-group">
+                    <span class="view-label">Location</span>
+                    <span class="view-value" id="view-location">--</span>
+                </div>
+            </div>
+
+            <div class="details-section-divider">
+                <span>Timeline & Key Dates</span>
+            </div>
+
+            <div class="view-grid col-3">
+                <div class="view-group">
+                    <span class="view-label">Date Applied</span>
+                    <span class="view-value" id="view-date-applied">--</span>
+                </div>
+                <div class="view-group">
+                    <span class="view-label">Interview Date</span>
+                    <span class="view-value" id="view-interview-date">--</span>
+                </div>
+                <div class="view-group">
+                    <span class="view-label">Assessment Date</span>
+                    <span class="view-value" id="view-assessment-date">--</span>
+                </div>
+            </div>
+
+            <div class="details-section-divider">
+                <span>Notes & Application Details</span>
+            </div>
+
+            <div class="view-group">
+                <p class="view-value notes-text" id="view-notes">No notes added.</p>
+            </div>
+
+            <!-- Application Activity Timeline (Email events + Manual updates) -->
+            <div class="details-section-divider">
+                <span>Application Activity Timeline</span>
+            </div>
+            <div id="details-timeline-container" class="details-timeline-container">
+                <div class="timeline-empty-text" id="timeline-empty-msg">No timeline events recorded yet.</div>
+            </div>
+
+            <div class="modal-footer details-modal-footer">
+                <button type="button" id="details-delete-btn-view" class="btn btn-danger">Remove Entry</button>
+                <button type="button" id="btn-edit-application" class="btn btn-primary" onclick="toggleEditMode(true)">Edit Application</button>
+            </div>
+        </div>
+
+        <!-- Edit Mode Container -->
+        <form id="details-app-form" class="hidden">
+            <input type="hidden" id="details-app-id">
+
+            <div class="modal-body details-modal-body">
+                <div class="form-group">
+                    <label for="details-job-url">Application Link / Job URL</label>
+                    <div class="url-autofill-group">
+                        <input type="url" id="details-job-url" name="job_url"
+                            placeholder="https://linkedin.com/jobs/view/...">
+                        <button type="button" id="btn-autofill-details" class="btn btn-sm btn-autofill"
+                            title="Auto-fill Company, Title, Location & Salary from URL">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                            </svg> Auto-Fill
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="details-company">Company Name <span class="required">*</span></label>
+                        <input type="text" id="details-company" name="company_name" required>
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="details-title">Job Title <span class="required">*</span></label>
+                        <input type="text" id="details-title" name="job_title" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-4">
+                        <label for="details-job-type">Job Type</label>
+                        <select id="details-job-type" name="job_type">
+                            <option value="Full-time">Full-time</option>
+                            <option value="Internship">Internship</option>
+                            <option value="Part-time">Part-time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-4">
+                        <label for="details-resume-version">Resume</label>
+                        <select id="details-resume-version" name="resume_version">
+                            <option value="">(None / Default)</option>
+                            {% for version in resume_versions %}
+                            <option value="{{ version.version_name }}">{{ version.version_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-4">
+                        <label for="details-salary">Salary / Compensation</label>
+                        <input type="text" id="details-salary" name="salary" placeholder="e.g. $120,000/yr or ₹15 LPA">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-12">
+                        <label for="details-location">Location</label>
+                        <input type="text" id="details-location" name="location"
+                            placeholder="e.g. Remote, San Francisco, CA">
+                    </div>
+                </div>
+
+                <div class="details-section-divider">
+                    <span>Timeline & Key Dates</span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="details-date-applied">Date Applied</label>
+                        <input type="date" id="details-date-applied" name="date_applied">
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="details-interview-date">Interview Date</label>
+                        <input type="date" id="details-interview-date" name="interview_date">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-12">
+                        <label for="details-assessment-date">Assessment Date</label>
+                        <input type="date" id="details-assessment-date" name="assessment_date">
+                    </div>
+                </div>
+
+                <div class="details-section-divider">
+                    <span>Notes & Application Details</span>
+                </div>
+
+                <div class="form-group">
+                    <textarea id="details-notes" name="notes" rows="4"
+                        placeholder="Job posting URL, salary details, interviewer names, follow-up notes..."></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer details-modal-footer">
+                <button type="button" id="details-cancel-btn" class="btn btn-secondary" onclick="toggleEditMode(false)">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="delete-modal" class="modal-backdrop hidden">
+    <div class="modal-card modal-sm">
+        <div class="modal-header">
+            <h3>Remove Application?</h3>
+            <button id="delete-modal-close" class="btn-icon">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to remove <strong id="delete-company-name">this entry</strong>? This action cannot
+                be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="delete-cancel-btn" class="btn btn-secondary">Cancel</button>
+            <button type="button" id="delete-confirm-btn" class="btn btn-danger">Remove</button>
+        </div>
+    </div>
+</div>
+
+<!-- Duplicate Detection Modal -->
+<div id="duplicate-modal" class="modal-backdrop hidden" style="z-index: 2000;">
+    <div class="modal-card modal-sm">
+        <div class="modal-header">
+            <h3 style="color: var(--warning-amber);">Duplicate Application Found</h3>
+            <button id="duplicate-modal-close" class="btn-icon">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>An application for <strong id="duplicate-company-name">Company</strong> - <strong id="duplicate-job-title">Title</strong> already exists in your tracker.</p>
+            <p>What would you like to do?</p>
+        </div>
+        <div class="modal-footer" style="flex-direction: column; gap: 0.5rem;">
+            <button type="button" id="duplicate-view-btn" class="btn btn-primary" style="width: 100%;">View Existing Application</button>
+            <button type="button" id="duplicate-add-btn" class="btn btn-secondary" style="width: 100%;">Add New Anyway</button>
+        </div>
+    </div>
+</div>
+
+<!-- Email Intelligence: Full Detail & Safe Sanitized Preview Modal -->
+<div id="email-details-modal" class="modal-backdrop hidden" style="z-index: 2100;">
+    <div class="modal-card modal-lg email-detail-modal-card">
+        <div class="modal-header email-detail-modal-header">
+            <div class="email-detail-header-info">
+                <span class="email-classification-badge" id="email-modal-badge">INTERVIEW INVITATION</span>
+                <h3 id="email-modal-subject">Email Subject</h3>
+                <span class="email-modal-meta" id="email-modal-meta">From: recruiter@company.com · Sep 1, 2026</span>
+            </div>
+            <button type="button" id="email-modal-close-btn" class="btn-icon">&times;</button>
+        </div>
+
+        <div class="modal-body email-detail-modal-body">
+            <!-- Extracted Intelligence Summary Card -->
+            <div class="email-extracted-grid">
+                <div class="extracted-item">
+                    <span class="extracted-label">Detected Company</span>
+                    <strong class="extracted-val" id="email-modal-company">--</strong>
+                </div>
+                <div class="extracted-item">
+                    <span class="extracted-label">Detected Role</span>
+                    <strong class="extracted-val" id="email-modal-role">--</strong>
+                </div>
+                <div class="extracted-item">
+                    <span class="extracted-label">Proposed Status</span>
+                    <span class="extracted-val-badge" id="email-modal-status">--</span>
+                </div>
+                <div class="extracted-item">
+                    <span class="extracted-label">Interview Date / Time</span>
+                    <strong class="extracted-val" id="email-modal-interview">--</strong>
+                </div>
+                <div class="extracted-item" id="email-modal-meeting-wrap">
+                    <span class="extracted-label">Meeting Link</span>
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="extracted-link" id="email-modal-meeting">--</a>
+                </div>
+                <div class="extracted-item">
+                    <span class="extracted-label">AI Confidence</span>
+                    <strong class="extracted-val" id="email-modal-confidence">--</strong>
+                </div>
+            </div>
+
+            <!-- Sanitized Safe Original Email Preview -->
+            <div class="details-section-divider">
+                <span>Original Email Content</span>
+            </div>
+            <div class="email-body-sandbox-wrapper">
+                <div id="email-modal-body-html" class="email-body-sandbox"></div>
+            </div>
+        </div>
+
+        <div class="modal-footer email-detail-modal-footer">
+            <button type="button" id="email-modal-draft-reply-btn" class="btn btn-secondary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+                <span>Draft Reply</span>
+            </button>
+            <button type="button" id="email-modal-confirm-update-btn" class="btn btn-primary">Update Application</button>
+        </div>
+    </div>
+</div>
+
+<!-- Email Intelligence: AI Recruiter Reply Draft Modal -->
+<div id="email-draft-modal" class="modal-backdrop hidden" style="z-index: 2200;">
+    <div class="modal-card modal-md">
+        <div class="modal-header">
+            <div>
+                <h3>AI Recruiter Reply Draft</h3>
+                <span class="modal-subtitle" id="email-draft-subtitle">Tailored reply generated from email context</span>
+            </div>
+            <button type="button" id="email-draft-close-btn" class="btn-icon">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="email-draft-textarea">Draft Message (Editable)</label>
+                <textarea id="email-draft-textarea" rows="8" class="form-control email-draft-textarea"></textarea>
+            </div>
+            <div class="draft-helper-note">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>You can edit this draft before copying it to your clipboard or email client. Antigravity does not automatically send emails without your action.</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="email-draft-cancel-btn" class="btn btn-secondary">Close</button>
+            <button type="button" id="email-draft-copy-btn" class="btn btn-primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span id="email-draft-copy-text">Copy to Clipboard</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Email Intelligence: Confirm Application Status Update Modal -->
+<div id="email-confirm-update-modal" class="modal-backdrop hidden" style="z-index: 2200;">
+    <div class="modal-card modal-sm">
+        <div class="modal-header">
+            <h3>Confirm Status Update</h3>
+            <button type="button" id="email-confirm-update-close" class="btn-icon">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Update application status for <strong id="confirm-update-company">Company</strong> · <span id="confirm-update-role">Role</span>?</p>
+            
+            <div class="status-change-preview-box">
+                <div class="status-change-side">
+                    <span class="status-change-label">Current:</span>
+                    <span class="status-pill" id="confirm-update-old-status">Applied</span>
+                </div>
+                <div class="status-change-arrow">&rarr;</div>
+                <div class="status-change-side">
+                    <span class="status-change-label">Detected:</span>
+                    <span class="status-pill" id="confirm-update-new-status">Interviewing</span>
+                </div>
+            </div>
+
+            <p class="update-reason-text" id="confirm-update-reason">"Interview invitation detected in email."</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="confirm-update-cancel-btn" class="btn btn-secondary">Cancel</button>
+            <button type="button" id="confirm-update-submit-btn" class="btn btn-primary">Confirm Update</button>
+        </div>
+    </div>
+</div>
+
+<!-- Email Intelligence: Disconnect Confirmation Modal -->
+<div id="email-disconnect-modal" class="modal-backdrop hidden" style="z-index: 2200;">
+    <div class="modal-card modal-sm">
+        <div class="modal-header">
+            <h3 style="color: var(--danger);">Disconnect Gmail?</h3>
+            <button type="button" id="email-disconnect-close" class="btn-icon">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Future email synchronization will stop.</p>
+            <p style="color: var(--text-secondary); font-size: 0.85rem;">Your existing job application records, history, and notes will remain safely in your tracker.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="email-disconnect-cancel-btn" class="btn btn-secondary">Cancel</button>
+            <button type="button" id="email-disconnect-confirm-btn" class="btn btn-danger">Disconnect</button>
+        </div>
+    </div>
+</div>
+
+<!-- Floating AI Career Assistant Chatbot Widget -->
+<div id="chatbot-widget-container" class="chatbot-widget-container">
+    <!-- Chat Window Drawer -->
+    <div id="chatbot-window" class="chatbot-window hidden" role="dialog" aria-labelledby="ai-chat-title">
+        <!-- 1. Chat Header -->
+        <div class="chatbot-header">
+            <div class="chatbot-header-info">
+                <div class="chatbot-avatar-badge">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path>
+                    </svg>
+                </div>
+                <div class="chatbot-header-titles">
+                    <div class="chatbot-title-row">
+                        <h4 id="ai-chat-title" class="chatbot-title">AI Career Assistant</h4>
+                        <span class="chatbot-status-online"><span class="online-dot"></span> Online</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-header-actions">
+                <!-- Dropdown Menu (Three dots) -->
+                <div class="chatbot-menu-wrap">
+                    <button id="chatbot-menu-btn" class="btn-icon" title="Chat Options" aria-label="Chat Options">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="12" cy="12" r="1.5"></circle>
+                            <circle cx="12" cy="5" r="1.5"></circle>
+                            <circle cx="12" cy="19" r="1.5"></circle>
+                        </svg>
+                    </button>
+                    <div id="chatbot-dropdown-menu" class="chatbot-dropdown-menu hidden">
+                        <button type="button" id="chatbot-new-chat-btn" class="dropdown-item">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14m-7-7h14"></path>
+                            </svg>
+                            <span>New Conversation</span>
+                        </button>
+                        <button type="button" id="chatbot-clear-btn" class="dropdown-item text-danger">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                            <span>Clear Conversation</span>
+                        </button>
+                    </div>
+                </div>
+                <button id="chatbot-minimize-btn" class="btn-icon" title="Close Assistant" aria-label="Close Assistant">&times;</button>
+            </div>
+        </div>
+
+        <!-- 2. Active Application Context Chip -->
+        <div id="ai-active-context" class="ai-active-context hidden">
+            <div class="ai-context-inner">
+                <span class="ai-context-badge">Target Job</span>
+                <span id="ai-context-label" class="ai-context-label">Company · Role</span>
+            </div>
+            <button type="button" id="ai-clear-context-btn" class="ai-clear-context-btn" title="Clear active context" aria-label="Clear active context">&times;</button>
+        </div>
+
+        <!-- 3. Inline Clear Confirmation -->
+        <div id="chatbot-clear-confirm" class="chatbot-clear-confirm hidden">
+            <span>Clear this conversation?</span>
+            <div class="confirm-actions">
+                <button type="button" id="btn-cancel-clear-chat" class="btn-clear-cancel">Cancel</button>
+                <button type="button" id="btn-confirm-clear-chat" class="btn-clear-confirm">Clear</button>
+            </div>
+        </div>
+
+        <!-- 4. Messages Area (With Career Copilot Welcome State) -->
+        <div id="chatbot-messages" class="chatbot-messages">
+            <!-- Dynamically populated -->
+        </div>
+
+        <!-- 5. Floating "New response ↓" Scroll Button -->
+        <button id="chatbot-scroll-down-btn" class="chatbot-scroll-down-btn hidden" title="Scroll to latest response">
+            <span>↓ New response</span>
+        </button>
+
+        <!-- 6. Suggested Actions Bar -->
+        <div class="chatbot-suggested-section">
+            <span class="suggested-actions-label">Suggested actions</span>
+            <div class="chatbot-quick-prompts" id="chatbot-quick-prompts">
+                <!-- Dynamically populated or default chips -->
+            </div>
+        </div>
+
+        <!-- 7. Chat Input Footer / Composer -->
+        <form id="chatbot-form" class="chatbot-input-area">
+            <input type="text" id="chatbot-input" placeholder="Ask about your applications..." autocomplete="off">
+            <button type="submit" id="chatbot-send-btn" class="chatbot-send-btn" title="Send Message" aria-label="Send Message">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <!-- Floating Toggle Button -->
+    <button id="chatbot-toggle-btn" class="chatbot-toggle-btn" title="Open AI Career Assistant" aria-label="Open AI Career Assistant">
+        <span class="chatbot-pulse-dot"></span>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path>
+        </svg>
+        <span class="chatbot-toggle-text">AI Assistant</span>
+        <span id="chatbot-unread-dot" class="chatbot-unread-dot hidden"></span>
+    </button>
+</div>
+{% endblock %}

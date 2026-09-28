@@ -1,0 +1,19 @@
+# Credentials and Environment Secrets
+.env
+
+# Python / Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+ENV/
+
+# Database files
+database/*.db
+instance/
+*.db
+*.sqlite3
+
+# Pytest / Coverage
+.pytest_cache/
+
