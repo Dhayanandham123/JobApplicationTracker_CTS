@@ -6,7 +6,9 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-job-tracker'
-    DATABASE = os.environ.get('DATABASE_PATH') or os.path.join(BASE_DIR, 'database', 'tracker.db')
+    DATABASE = os.environ.get('DATABASE_PATH') or (
+        '/tmp/tracker.db' if os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_ENV') else os.path.join(BASE_DIR, 'database', 'tracker.db')
+    )
     DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 't')
     GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID') or 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'
     GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')

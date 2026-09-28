@@ -238,7 +238,10 @@ PHOTO_MAX_BYTES = 2 * 1024 * 1024  # 2 MB
 
 def _avatar_dir():
     from flask import current_app
-    upload_dir = os.path.join(current_app.instance_path, 'uploads', 'avatars')
+    if os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_ENV'):
+        upload_dir = '/tmp/uploads/avatars'
+    else:
+        upload_dir = os.path.join(current_app.instance_path, 'uploads', 'avatars')
     os.makedirs(upload_dir, exist_ok=True)
     return upload_dir
 
